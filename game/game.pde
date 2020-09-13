@@ -1,3 +1,4 @@
+import processing.sound.*;
 PImage bg;
 PFont font1, font2, font3, font4;
 String[] lines;
@@ -11,6 +12,7 @@ int prevScore = 0;
 int maxScore;
 boolean gameOver = false;
 PImage cursorArrow, cursorHand;
+SoundFile backgroundMusic;
 
 //---------------------------------------------------------------------------------------
 
@@ -32,13 +34,17 @@ void setup() {
   restart = new Button("RESTART", width / 2 + 100, height / 2);
   chargingBar = new ChargingBar(width - 115, 55, 100, 20);
   crosses = new ArrayList<Cross>();
-  lines = loadStrings("maxScores.txt");
+  lines = loadStrings("maxScore.txt");
   if (lines.length == 0)
     lines = new String[] { "0" };
   cursorArrow = loadImage("cursor_arrow.png");
   cursorHand = loadImage("cursor_hand.png");
-  cursor(cursorArrow);
+  cursor(cursorArrow, 3, 3);
   maxScore = int(lines[0]);
+  backgroundMusic = new SoundFile(this, "caesarTheme.wav");
+  backgroundMusic.loop();
+  backgroundMusic.amp(0.3);
+  //add walking, clicking, hitting sound
 }
 
 //---------------------------------------------------------------------------------------
@@ -69,9 +75,9 @@ void draw() {
     restart.show();
 
     if (quit.hovered() || restart.hovered())
-      cursor(cursorHand);
+      cursor(cursorHand, 3, 3);
     else
-      cursor(cursorArrow);
+      cursor(cursorArrow, 3, 3);
 
     getMaxScore();
 
@@ -121,12 +127,12 @@ void writeScore() {
   }
 }
 
-//-------------------------determines whether a new maxscore was achieved and shows a message-----------------------------------------
+//-------------------------determines whether a new maxscore was achieved, saves it and shows a message-----------------------------------------
 
 void getMaxScore() {
   if (score > maxScore) {
     lines[0] = str(score);
-    saveStrings("maxScores.txt", lines);
+    saveStrings("maxScore.txt", lines);
     push();
     textAlign(CENTER);
     textSize(25);
